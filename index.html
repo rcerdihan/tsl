@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Turkish Superleague</title>
+
+<style>
+    body {
+        background: rgb(186, 93, 7);
+        color: black;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    h1 {
+        color: white;
+        text-align: center;
+        padding: 20px 0;
+        margin: 0;
+    }
+
+    .menu_container {
+        background-color: #741818;
+        padding: 20px;
+        text-align: center;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        border-bottom: 3px solid gold;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+
+    .menu_container a {
+        color: black;
+        background-color: azure;
+        text-decoration: none;
+        padding: 10px 20px;
+        font-size: 18px;
+        margin: 0 10px;
+        border: 1px solid white;
+        border-radius: 5px;
+        transition: 0.3s;
+        display: inline-block;
+    }
+
+    .menu_container a:hover {
+        background-color: rgb(186, 93, 7);
+        color: white;
+        cursor: pointer;
+    }
+
+    .teams {
+        background-color: white;
+        margin: 20px auto;
+        padding: 20px;
+        max-width: 1000px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        border-radius: 10px;
+        box-sizing: border-box;
+    }
+
+    .logos {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 15px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        transition: transform 0.2s;
+    }
+
+    .logos:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .logos img {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+    }
+
+    .logos p {
+        margin-top: 10px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .point_table {
+        background-color: white;
+        margin: 20px auto;
+        padding: 20px;
+        max-width: 1000px;
+        border-radius: 10px;
+        overflow-x: auto;
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        min-height: 200px;
+    }
+
+    .standings_table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 600px;
+    }
+
+    .standings_table thead {
+        background-color: #741818;
+        color: white;
+    }
+
+    .standings_table th, 
+    .standings_table td {
+        padding: 12px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .standings_table tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    .form-badge {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin: 0 2px;
+    }
+    .win { background-color: #2ecc71; }
+    .draw { background-color: #95a5a6; }
+    .loss { background-color: #e74c3c; }
+
+    @media (max-width: 600px) {
+        .teams {
+            grid-template-columns: 1fr 1fr;
+        }
+        .menu_container a {
+            display: block;
+            margin: 10px auto;
+            width: 80%;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="menu_container">
+    <a href="#teams">Teams</a>
+    <a href="#point_table">Standings</a>
+</div>
+
+<h1>Turkish Super League Teams</h1>
+
+<div class="teams" id="teams">
+    <div class="logos"><img src="logos/fb.png" alt="FB"><p>Fenerbahçe</p></div>
+    <div class="logos"><img src="logos/gs.png" alt="GS"><p>Galatasaray</p></div>
+    <div class="logos"><img src="logos/bjk.png" alt="BJK"><p>Beşiktaş</p></div>
+    <div class="logos"><img src="logos/ts.png" alt="TS"><p>Trabzonspor</p></div>
+    <div class="logos"><img src="logos/bsk.png" alt="IBFK"><p>Başakşehir</p></div>
+    <div class="logos"><img src="logos/ant.png" alt="ANT"><p>Antalyaspor</p></div>
+    <div class="logos"><img src="logos/aln.png" alt="ALN"><p>Alanyaspor</p></div>
+    <div class="logos"><img src="logos/crs.png" alt="RİZ"><p>Rizespor</p></div>
+    <div class="logos"><img src="logos/kys.png" alt="KAY"><p>Kayserispor</p></div>
+    <div class="logos"><img src="logos/ks.png" alt="KOC"><p>Kocaelispor</p></div>
+    <div class="logos"><img src="logos/ksp.png" alt="KAS"><p>Kasımpaşa</p></div>
+    <div class="logos"><img src="logos/goz.png" alt="GÖZ"><p>Göztepe</p></div>
+    <div class="logos"><img src="logos/sms.png" alt="SAM"><p>Samsunspor</p></div>
+    <div class="logos"><img src="logos/kns.png" alt="KON"><p>Konyaspor</p></div>
+    <div class="logos"><img src="logos/gfk.png" alt="GFK"><p>Gaziantep FK</p></div>
+    <div class="logos"><img src="logos/gb.png" alt="GEN"><p>Gençlerbirliği</p></div>
+    <div class="logos"><img src="logos/fkg.png" alt="FKG"><p>F. Karagümrük</p></div>
+    <div class="logos"><img src="logos/eyp.png" alt="EYP"><p>Eyüpspor</p></div>
+</div>
+
+<div class="point_table" id="point_table">
+    <table class="standings_table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th style="text-align: left;">Team</th>
+                <th>MP</th>
+                <th>W</th>
+                <th>D</th>
+                <th>L</th>
+                <th>GF</th>
+                <th>GA</th>
+                <th>GD</th>
+                <th>Pts</th>
+                <th>Form</th>
+            </tr>
+        </thead>
+        <tbody id="table_body">
+            <tr><td colspan="11">Veriler yükleniyor... (Eğer değişmezse Google Sheet iznini kontrol et)</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Linki buraya tırnak içinde yapıştır
+    const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHg4fAaHacYp2mjiCm1VZeepZYsMzjxAmYexmpto9f9XMXM9HCiaFPfd0MhE8DGWlEaNCz3JDh07Xr/pub?output=csv";
+
+    async function tabloyuDoldur() {
+        const tbody = document.getElementById("table_body");
+        
+        try {
+            const response = await fetch(sheetURL);
+            if (!response.ok) throw new Error("Veri çekme hatası: " + response.status);
+            
+            const data = await response.text();
+            // Satırlara böl ve ilk satırı (başlığı) atla
+            const rows = data.split("\n").slice(1);
+            
+            tbody.innerHTML = ""; // Yükleniyor yazısını temizle
+
+            rows.forEach(row => {
+                // Virgülle ayırırken tırnak içindeki virgülleri görmezden gelen regex
+                const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                
+                if (cols.length >= 8) {
+                    // Veri temizleme
+                    let rawRankName = cols[0].replace(/[*"]/g, "").trim();
+                    let rank = "-";
+                    let team = rawRankName;
+
+                    if (rawRankName.includes(".")) {
+                        const parts = rawRankName.split(".");
+                        rank = parts[0];
+                        team = parts.slice(1).join(".").trim();
+                    }
+
+                    let points = cols[8] ? cols[8].replace(/[*"]/g, "").trim() : "0";
+
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${rank}</td>
+                        <td style="text-align:left; font-weight:bold;">${team}</td>
+                        <td>${cols[1]}</td>
+                        <td>${cols[2]}</td>
+                        <td>${cols[3]}</td>
+                        <td>${cols[4]}</td>
+                        <td>${cols[5]}</td>
+                        <td>${cols[6]}</td>
+                        <td>${cols[7]}</td>
+                        <td><strong>${points}</strong></td>
+                        <td>
+                            <span class="form-badge win"></span>
+                            <span class="form-badge win"></span>
+                            <span class="form-badge draw"></span>
+                            <span class="form-badge win"></span>
+                            <span class="form-badge loss"></span>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            });
+        } catch (error) {
+            console.error("Hata:", error);
+            tbody.innerHTML = `<tr><td colspan="11" style="color:red; padding:20px;">Hata: ${error.message} <br> Lütfen linkin dışarıya açık olduğundan emin olun.</td></tr>`;
+        }
+    }
+
+    // Fonksiyonu çalıştır
+    tabloyuDoldur();
+</script>
+
+</body>
+</html>
