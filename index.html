@@ -134,11 +134,18 @@
     
     
 
-<script>
+
+    
+    
+    
+
+    
+
+
+    
+    <script>
     const standingsURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHg4fAaHacYp2mjiCm1VZeepZYsMzjxAmYexmpto9f9XMXM9HCiaFPfd0MhE8DGWlEaNCz3JDh07Xr/pub?gid=0&single=true&output=csv";
     const scorersURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHg4fAaHacYp2mjiCm1VZeepZYsMzjxAmYexmpto9f9XMXM9HCiaFPfd0MhE8DGWlEaNCz3JDh07Xr/pub?gid=468146902&single=true&output=csv";
-    
-    
     const assistsURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHg4fAaHacYp2mjiCm1VZeepZYsMzjxAmYexmpto9f9XMXM9HCiaFPfd0MhE8DGWlEaNCz3JDh07Xr/pub?gid=1186417530&single=true&output=csv";
 
     async function fetchData(url, tbodyID, type, limit = 0) {
@@ -147,93 +154,121 @@
             if (!response.ok) throw new Error("Linke ulaşılamadı");
             
             const csvData = await response.text();
-            
-            const rows = csvData.split('\n').slice(1);
+            // Google Sheets bazen CSV'yi tırnaklı, bazen düz virgüllü verir.
+            // Bu regex, tırnak içindeki virgülleri görmezden gelerek ayırır.
+            const rows = csvData.split('\n').slice(1); 
             const tbody = document.getElementById(tbodyID);
             
             tbody.innerHTML = "";
             
             let rankCounter = 1; 
-            let rowCount = 0;    
+            let countLimit = 0;
 
-            rows.forEach((row) => {
-                
-                if (limit > 0 && rowCount >= limit) return;
+            for (let i = 0; i < rows.length; i++) {
+                if (limit > 0 && countLimit >= limit) break;
 
+                const row = rows[i];
+                // Virgülle ayırma işlemi (Karmaşık CSV satırları için güvenli yöntem)
+                const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                 
-                const cols = row.split(',');
-                
-                
-                let col0 = cols[0] ? cols[0].replace(/[*"]/g, "").trim() : "";
-                let col1 = cols[1] ? cols[1].replace(/[*"]/g, "").trim() : "";
-                
-                
-                if (!col0) return;
-
                 let rowHTML = "";
 
-                
+                // --- 1. PUAN DURUMU (STANDINGS) ---
                 if (type === "standings") {
-                     
-                     if (cols.length < 8) return;
+                     let rawName = cols[0] ? cols[0].replace(/[*"]/g, "").trim() : "";
+                     if (!rawName || cols.length < 8) continue;
 
                      let rank = "-";
-                     let teamName = col0;
-
-                     if (col0.includes('.')) {
-                        let parts = col0.split('.');
+                     let teamName = rawName;
+                     if (rawName.includes('.')) {
+                        let parts = rawName.split('.');
                         rank = parts[0];
                         teamName = parts.slice(1).join('.').trim();
                      }
 
                      rowHTML += `<td>${rank}</td><td style="text-align:left; font-weight:bold;">${teamName}</td>`;
-                     
-                     for(let i=1; i<9; i++) {
-                        let data = cols[i] ? cols[i].replace(/[*"]/g, "").trim() : "-";
-                        if(i === 8) rowHTML += `<td class="points_col">${data}</td>`;
+                     for(let k=1; k<9; k++) {
+                        let data = cols[k] ? cols[k].replace(/[*"]/g, "").trim() : "-";
+                        if(k === 8) rowHTML += `<td class="points_col">${data}</td>`;
                         else rowHTML += `<td>${data}</td>`;
                      }
                      rowHTML += `<td><span class="form_badge win"></span><span class="form_badge win"></span><span class="form_badge draw"></span><span class="form_badge win"></span><span class="form_badge loss"></span></td>`;
                      
-                     rowCount++;
+                     const tr = document.createElement("tr");
+                     tr.innerHTML = rowHTML;
+                     tbody.appendChild(tr);
 
-                } else {
-                    
-                    
-                    
-                    if (!col1 || isNaN(col1)) return;
+                } 
+                // --- 2. GOL KRALLIĞI (Senin Tarifine Göre: A=İsim+Takım, B=Gol) ---
+                else if (type === "scorers") {
+                    // Sütun A (Index 0): Oyuncu Adı ve Takımı
+                    // Sütun B (Index 1): Gol Sayısı
+                    let col0 = cols[0] ? cols[0].replace(/[*"]/g, "").trim() : "";
+                    let col1 = cols[1] ? cols[1].replace(/[*"]/g, "").trim() : "0";
 
-                    
+                    // Eğer isim boşsa atla
+                    if (!col0) continue;
+
                     rowHTML += `<td>${rankCounter}</td>
-                                <td style="text-align:left;">${col0}</td>
+                                <td style="text-align:left; font-weight:bold;">${col0}</td>
                                 <td><strong>${col1}</strong></td>`;
                     
-                    rankCounter++; 
-                    rowCount++;  
-                }
-
-                if (rowHTML) {
                     const tr = document.createElement("tr");
                     tr.innerHTML = rowHTML;
                     tbody.appendChild(tr);
+                    
+                    rankCounter++;
+                    countLimit++;
+
+                } 
+                // --- 3. ASİST KRALLIĞI (Görsele Göre: B=Oyuncu, C=Takım, E=Asist) ---
+                else if (type === "assists") {
+                    // Sütun B (Index 1): Oyuncu
+                    // Sütun C (Index 2): Takım
+                    // Sütun E (Index 4): Asist (*9* formatında)
+                    
+                    let playerName = cols[1] ? cols[1].replace(/[*"]/g, "").trim() : "";
+                    let teamName = cols[2] ? cols[2].replace(/[*"]/g, "").trim() : "";
+                    let assists = cols[4] ? cols[4].replace(/[*"]/g, "").trim() : "0";
+
+                    // Boş satırları veya başlık satırını atla
+                    if (!playerName || playerName === "Oyuncu" || assists === "") continue;
+
+                    rowHTML += `<td>${rankCounter}</td>
+                                <td style="text-align:left; font-weight:bold;">
+                                    ${playerName} 
+                                    <span style="font-size:0.85em; font-weight:normal; color:#555; margin-left:5px;">
+                                        (${teamName})
+                                    </span>
+                                </td>
+                                <td><strong>${assists}</strong></td>`;
+                    
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = rowHTML;
+                    tbody.appendChild(tr);
+                    
+                    rankCounter++;
+                    countLimit++;
                 }
-            });
+            }
         } catch (error) {
             console.error("Hata:", error);
-            document.getElementById(tbodyID).innerHTML = `<tr><td colspan="100%">Veri yüklenirken hata oluştu.</td></tr>`;
+            document.getElementById(tbodyID).innerHTML = `<tr><td colspan="100%">Veri yüklenemedi.</td></tr>`;
         }
     }
 
+    // --- ÇALIŞTIRMA ---
     
+    // 1. Puan Durumu
     fetchData(standingsURL, "standings_body", "standings", 0); 
     
-   
-    fetchData(scorersURL, "scorers_body", "stats", 5);       
+    // 2. Gol Krallığı (TFF'den gelen A=İsimTakım, B=Gol formatı)
+    fetchData(scorersURL, "scorers_body", "scorers", 5);       
     
-    
-    fetchData(assistsURL, "assists_body", "stats", 5);       
+    // 3. Asist Krallığı (Görseldeki temiz tablo formatı)
+    // DİKKAT: assistsURL değişkenine yeni tablonun CSV linkini koymalısın.
+    fetchData(assistsURL, "assists_body", "assists", 5);       
 
 </script>
-
 </body>
 </html>
