@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Turkish Superleague</title>
+<title>Turkish Super League - Live Stats</title>
 
 <style>
     body {
@@ -11,16 +11,19 @@
         color: black;
         margin: 0;
         padding: 0;
-        font-family: Arial, sans-serif;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    h1 {
+    h1, h2 {
         color: white;
         text-align: center;
         padding: 20px 0;
         margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 2px;
     }
 
+    
     .menu_container {
         background-color: #741818;
         padding: 20px;
@@ -36,61 +39,63 @@
         color: black;
         background-color: azure;
         text-decoration: none;
-        padding: 10px 20px;
-        font-size: 18px;
+        padding: 10px 25px;
+        font-size: 16px;
+        font-weight: bold;
         margin: 0 10px;
         border: 1px solid white;
         border-radius: 5px;
-        transition: 0.3s;
+        transition: 0.3s ease;
         display: inline-block;
     }
 
     .menu_container a:hover {
-        background-color: rgb(186, 93, 7);
-        color: white;
-        cursor: pointer;
+        background-color: #741818;
+        color: gold;
+        border-color: gold;
     }
 
-    .teams {
+    
+    .teams_container {
         background-color: white;
         margin: 20px auto;
         padding: 20px;
         max-width: 1000px;
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 15px;
         border-radius: 10px;
-        box-sizing: border-box;
     }
 
-    .logos {
+    .team_card {
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 15px;
+        padding: 10px;
         border: 1px solid #eee;
         border-radius: 8px;
-        transition: transform 0.2s;
+        transition: 0.3s;
     }
 
-    .logos:hover {
+    .team_card:hover {
         transform: translateY(-5px);
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
 
-    .logos img {
-        width: 60px;
-        height: 60px;
+    .team_card img {
+        width: 50px;
+        height: 50px;
         object-fit: contain;
     }
 
-    .logos p {
+    .team_card p {
         margin-top: 10px;
+        font-size: 14px;
         font-weight: bold;
-        text-align: center;
     }
 
-    .point_table {
+    
+    .table_wrapper {
         background-color: white;
         margin: 20px auto;
         padding: 20px;
@@ -98,35 +103,36 @@
         border-radius: 10px;
         overflow-x: auto;
         box-shadow: 0 0 20px rgba(0,0,0,0.2);
-        min-height: 200px;
     }
 
-    .standings_table {
+    table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 600px;
+        margin-bottom: 10px;
     }
 
-    .standings_table thead {
+    thead {
         background-color: #741818;
         color: white;
     }
 
-    .standings_table th, 
-    .standings_table td {
+    th, td {
         padding: 12px;
         text-align: center;
         border-bottom: 1px solid #ddd;
     }
 
-    .standings_table tbody tr:hover {
-        background-color: #f5f5f5;
+    tbody tr:hover {
+        background-color: #f9f9f9;
     }
 
-    .form-badge {
+    .points_col { font-weight: bold; color: #741818; }
+
+    
+    .form_badge {
         display: inline-block;
-        width: 12px;
-        height: 12px;
+        width: 10px;
+        height: 10px;
         border-radius: 50%;
         margin: 0 2px;
     }
@@ -135,13 +141,10 @@
     .loss { background-color: #e74c3c; }
 
     @media (max-width: 600px) {
-        .teams {
-            grid-template-columns: 1fr 1fr;
-        }
         .menu_container a {
             display: block;
-            margin: 10px auto;
-            width: 80%;
+            margin: 5px auto;
+            width: 90%;
         }
     }
 </style>
@@ -151,34 +154,36 @@
 
 <div class="menu_container">
     <a href="#teams">Teams</a>
-    <a href="#point_table">Standings</a>
+    <a href="#standings">Standings</a>
+    <a href="#stats">Stats</a>
 </div>
 
-<h1>Turkish Super League Teams</h1>
+<h1>Turkish Super League</h1>
 
-<div class="teams" id="teams">
-    <div class="logos"><img src="logos/fb.png" alt="FB"><p>Fenerbahçe</p></div>
-    <div class="logos"><img src="logos/gs.png" alt="GS"><p>Galatasaray</p></div>
-    <div class="logos"><img src="logos/bjk.png" alt="BJK"><p>Beşiktaş</p></div>
-    <div class="logos"><img src="logos/ts.png" alt="TS"><p>Trabzonspor</p></div>
-    <div class="logos"><img src="logos/bsk.png" alt="IBFK"><p>Başakşehir</p></div>
-    <div class="logos"><img src="logos/ant.png" alt="ANT"><p>Antalyaspor</p></div>
-    <div class="logos"><img src="logos/aln.png" alt="ALN"><p>Alanyaspor</p></div>
-    <div class="logos"><img src="logos/crs.png" alt="RİZ"><p>Rizespor</p></div>
-    <div class="logos"><img src="logos/kys.png" alt="KAY"><p>Kayserispor</p></div>
-    <div class="logos"><img src="logos/ks.png" alt="KOC"><p>Kocaelispor</p></div>
-    <div class="logos"><img src="logos/ksp.png" alt="KAS"><p>Kasımpaşa</p></div>
-    <div class="logos"><img src="logos/goz.png" alt="GÖZ"><p>Göztepe</p></div>
-    <div class="logos"><img src="logos/sms.png" alt="SAM"><p>Samsunspor</p></div>
-    <div class="logos"><img src="logos/kns.png" alt="KON"><p>Konyaspor</p></div>
-    <div class="logos"><img src="logos/gfk.png" alt="GFK"><p>Gaziantep FK</p></div>
-    <div class="logos"><img src="logos/gb.png" alt="GEN"><p>Gençlerbirliği</p></div>
-    <div class="logos"><img src="logos/fkg.png" alt="FKG"><p>F. Karagümrük</p></div>
-    <div class="logos"><img src="logos/eyp.png" alt="EYP"><p>Eyüpspor</p></div>
+<div class="teams_container" id="teams">
+    <div class="team_card"><img src="logos/fb.png" alt="FB"><p>Fenerbahçe</p></div>
+    <div class="team_card"><img src="logos/gs.png" alt="GS"><p>Galatasaray</p></div>
+    <div class="team_card"><img src="logos/bjk.png" alt="BJK"><p>Beşiktaş</p></div>
+    <div class="team_card"><img src="logos/ts.png" alt="TS"><p>Trabzonspor</p></div>
+    <div class="team_card"><img src="logos/bsk.png" alt="IBFK"><p>Başakşehir</p></div>
+    <div class="team_card"><img src="logos/ant.png" alt="ANT"><p>Antalyaspor</p></div>
+    <div class="team_card"><img src="logos/aln.png" alt="ALN"><p>Alanyaspor</p></div>
+    <div class="team_card"><img src="logos/crs.png" alt="RIZ"><p>Rizespor</p></div>
+    <div class="team_card"><img src="logos/kys.png" alt="KAY"><p>Kayserispor</p></div>
+    <div class="team_card"><img src="logos/ks.png" alt="KOC"><p>Kocaelispor</p></div>
+    <div class="team_card"><img src="logos/ksp.png" alt="KAS"><p>Kasımpaşa</p></div>
+    <div class="team_card"><img src="logos/goz.png" alt="GOZ"><p>Göztepe</p></div>
+    <div class="team_card"><img src="logos/sms.png" alt="SAM"><p>Samsunspor</p></div>
+    <div class="team_card"><img src="logos/kns.png" alt="KON"><p>Konyaspor</p></div>
+    <div class="team_card"><img src="logos/gfk.png" alt="GFK"><p>Gaziantep FK</p></div>
+    <div class="team_card"><img src="logos/gb.png" alt="GEN"><p>Gençlerbirliği</p></div>
+    <div class="team_card"><img src="logos/fkg.png" alt="FKG"><p>F. Karagümrük</p></div>
+    <div class="team_card"><img src="logos/eyp.png" alt="EYP"><p>Eyüpspor</p></div>
 </div>
 
-<div class="point_table" id="point_table">
-    <table class="standings_table">
+<h2>League Standings</h2>
+<div class="table_wrapper" id="standings">
+    <table>
         <thead>
             <tr>
                 <th>#</th>
@@ -190,82 +195,95 @@
                 <th>GF</th>
                 <th>GA</th>
                 <th>GD</th>
-                <th>Pts</th>
+                <th class="points_col">Pts</th>
                 <th>Form</th>
             </tr>
         </thead>
-        <tbody id="table_body">
-            <tr><td colspan="11">Veriler yükleniyor... (Eğer değişmezse Google Sheet iznini kontrol et)</td></tr>
+        <tbody id="standings_body">
+            <tr><td colspan="11">Loading standings...</td></tr>
         </tbody>
     </table>
 </div>
 
-<script>
-    // Linki buraya tırnak içinde yapıştır
-    const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHg4fAaHacYp2mjiCm1VZeepZYsMzjxAmYexmpto9f9XMXM9HCiaFPfd0MhE8DGWlEaNCz3JDh07Xr/pub?output=csv";
+<h2 id="stats">Player Statistics</h2>
+<div class="table_wrapper">
+    <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
+        <div>
+            <h3>Top Scorers</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th style="text-align: left;">Player / Team</th>
+                        <th>Goals</th>
+                    </tr>
+                </thead>
+                <tbody id="scorers_body">
+                    <tr><td colspan="3">Loading scorers...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-    async function tabloyuDoldur() {
-        const tbody = document.getElementById("table_body");
-        
+<script>
+    const standingsURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHg4fAaHacYp2mjiCm1VZeepZYsMzjxAmYexmpto9f9XMXM9HCiaFPfd0MhE8DGWlEaNCz3JDh07Xr/pub?gid=0&single=true&output=csv";
+    const scorersURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHg4fAaHacYp2mjiCm1VZeepZYsMzjxAmYexmpto9f9XMXM9HCiaFPfd0MhE8DGWlEaNCz3JDh07Xr/pub?gid=468146902&single=true&output=csv";
+
+    
+    async function fetchData(url, tbodyID, colCount) {
         try {
-            const response = await fetch(sheetURL);
-            if (!response.ok) throw new Error("Veri çekme hatası: " + response.status);
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("Network response was not ok");
             
-            const data = await response.text();
-            // Satırlara böl ve ilk satırı (başlığı) atla
-            const rows = data.split("\n").slice(1);
-            
-            tbody.innerHTML = ""; // Yükleniyor yazısını temizle
+            const csvData = await response.text();
+            const rows = csvData.split('\n').slice(1);
+            const tbody = document.getElementById(tbodyID);
+        
+            tbody.innerHTML = "";
 
             rows.forEach(row => {
-                // Virgülle ayırırken tırnak içindeki virgülleri görmezden gelen regex
-                const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                
-                if (cols.length >= 8) {
-                    // Veri temizleme
-                    let rawRankName = cols[0].replace(/[*"]/g, "").trim();
-                    let rank = "-";
-                    let team = rawRankName;
-
-                    if (rawRankName.includes(".")) {
-                        const parts = rawRankName.split(".");
-                        rank = parts[0];
-                        team = parts.slice(1).join(".").trim();
+                const cols = row.split(',');
+                if (cols.length >= colCount) {
+                    const tr = document.createElement("tr");
+                    
+                    let rowHTML = "";
+                    
+                    for (let i = 0; i < colCount; i++) {
+                        let cellData = cols[i].replace(/[*"]/g, "").trim();
+                        
+                        
+                        if (tbodyID === "standings_body" && i === 9) {
+                            rowHTML += `<td class="points_col">${cellData}</td>`;
+                        } else {
+                            rowHTML += `<td>${cellData}</td>`;
+                        }
                     }
 
-                    let points = cols[8] ? cols[8].replace(/[*"]/g, "").trim() : "0";
+                    
+                    if (tbodyID === "standings_body") {
+                        rowHTML += `<td>
+                            <span class="form_badge win"></span>
+                            <span class="form_badge win"></span>
+                            <span class="form_badge draw"></span>
+                            <span class="form_badge win"></span>
+                            <span class="form_badge loss"></span>
+                        </td>`;
+                    }
 
-                    const tr = document.createElement("tr");
-                    tr.innerHTML = `
-                        <td>${rank}</td>
-                        <td style="text-align:left; font-weight:bold;">${team}</td>
-                        <td>${cols[1]}</td>
-                        <td>${cols[2]}</td>
-                        <td>${cols[3]}</td>
-                        <td>${cols[4]}</td>
-                        <td>${cols[5]}</td>
-                        <td>${cols[6]}</td>
-                        <td>${cols[7]}</td>
-                        <td><strong>${points}</strong></td>
-                        <td>
-                            <span class="form-badge win"></span>
-                            <span class="form-badge win"></span>
-                            <span class="form-badge draw"></span>
-                            <span class="form-badge win"></span>
-                            <span class="form-badge loss"></span>
-                        </td>
-                    `;
+                    tr.innerHTML = rowHTML;
                     tbody.appendChild(tr);
                 }
             });
         } catch (error) {
-            console.error("Hata:", error);
-            tbody.innerHTML = `<tr><td colspan="11" style="color:red; padding:20px;">Hata: ${error.message} <br> Lütfen linkin dışarıya açık olduğundan emin olun.</td></tr>`;
+            console.error("Failed to fetch data:", error);
+            document.getElementById(tbodyID).innerHTML = `<tr><td colspan="100%">Error loading data.</td></tr>`;
         }
     }
 
-    // Fonksiyonu çalıştır
-    tabloyuDoldur();
+    
+    fetchData(standingsURL, "standings_body", 10); 
+    fetchData(scorersURL, "scorers_body", 3);       
 </script>
 
 </body>
