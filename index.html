@@ -130,96 +130,108 @@
     </div>
 </div>
 
-<script>
+
     
+    
+
+<script>
     const standingsURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHg4fAaHacYp2mjiCm1VZeepZYsMzjxAmYexmpto9f9XMXM9HCiaFPfd0MhE8DGWlEaNCz3JDh07Xr/pub?gid=0&single=true&output=csv";
     const scorersURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHg4fAaHacYp2mjiCm1VZeepZYsMzjxAmYexmpto9f9XMXM9HCiaFPfd0MhE8DGWlEaNCz3JDh07Xr/pub?gid=468146902&single=true&output=csv";
     
     
     const assistsURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHg4fAaHacYp2mjiCm1VZeepZYsMzjxAmYexmpto9f9XMXM9HCiaFPfd0MhE8DGWlEaNCz3JDh07Xr/pub?gid=1186417530&single=true&output=csv";
 
-    async function fetchData(url, tbodyID, colCount, limit = 0) {
+    async function fetchData(url, tbodyID, type, limit = 0) {
         try {
             const response = await fetch(url);
-            if (!response.ok) throw new Error("Network response was not ok");
+            if (!response.ok) throw new Error("Linke ulaşılamadı");
             
             const csvData = await response.text();
+            
             const rows = csvData.split('\n').slice(1);
             const tbody = document.getElementById(tbodyID);
             
             tbody.innerHTML = "";
             
-            
-            const targetRows = limit > 0 ? rows.slice(0, limit) : rows;
+            let rankCounter = 1; 
+            let rowCount = 0;    
 
-            targetRows.forEach((row, index) => {
+            rows.forEach((row) => {
+                
+                if (limit > 0 && rowCount >= limit) return;
+
+                
                 const cols = row.split(',');
                 
                 
-                if (cols.length < 2) return;
+                let col0 = cols[0] ? cols[0].replace(/[*"]/g, "").trim() : "";
+                let col1 = cols[1] ? cols[1].replace(/[*"]/g, "").trim() : "";
+                
+                
+                if (!col0) return;
 
-                const tr = document.createElement("tr");
                 let rowHTML = "";
 
                 
-                if (tbodyID === "standings_body") {
+                if (type === "standings") {
                      
-                     let rawName = cols[0].replace(/[*"]/g, "").trim();
-                     let rank = "-";
-                     let teamName = rawName;
+                     if (cols.length < 8) return;
 
-                     if (rawName.includes('.')) {
-                        let parts = rawName.split('.');
+                     let rank = "-";
+                     let teamName = col0;
+
+                     if (col0.includes('.')) {
+                        let parts = col0.split('.');
                         rank = parts[0];
                         teamName = parts.slice(1).join('.').trim();
                      }
 
                      rowHTML += `<td>${rank}</td><td style="text-align:left; font-weight:bold;">${teamName}</td>`;
                      
-                     
                      for(let i=1; i<9; i++) {
                         let data = cols[i] ? cols[i].replace(/[*"]/g, "").trim() : "-";
-                        if(i === 8) {
-                            rowHTML += `<td class="points_col">${data}</td>`;
-                        } else {
-                            rowHTML += `<td>${data}</td>`;
-                        }
+                        if(i === 8) rowHTML += `<td class="points_col">${data}</td>`;
+                        else rowHTML += `<td>${data}</td>`;
                      }
-                     
                      rowHTML += `<td><span class="form_badge win"></span><span class="form_badge win"></span><span class="form_badge draw"></span><span class="form_badge win"></span><span class="form_badge loss"></span></td>`;
-                
-                
+                     
+                     rowCount++;
+
                 } else {
                     
                     
-                    let rank = index + 1;
-                    let playerInfo = cols[0].replace(/[*"]/g, "").trim();
-                    let count = cols[1] ? cols[1].replace(/[*"]/g, "").trim() : "0";
+                    
+                    if (!col1 || isNaN(col1)) return;
 
-                    rowHTML += `<td>${rank}</td>
-                                <td style="text-align:left;">${playerInfo}</td>
-                                <td><strong>${count}</strong></td>`;
+                    
+                    rowHTML += `<td>${rankCounter}</td>
+                                <td style="text-align:left;">${col0}</td>
+                                <td><strong>${col1}</strong></td>`;
+                    
+                    rankCounter++; 
+                    rowCount++;  
                 }
 
-                tr.innerHTML = rowHTML;
-                tbody.appendChild(tr);
+                if (rowHTML) {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = rowHTML;
+                    tbody.appendChild(tr);
+                }
             });
         } catch (error) {
-            console.error("Failed to fetch data:", error);
-            document.getElementById(tbodyID).innerHTML = `<tr><td colspan="100%">Error loading data. Check console.</td></tr>`;
+            console.error("Hata:", error);
+            document.getElementById(tbodyID).innerHTML = `<tr><td colspan="100%">Veri yüklenirken hata oluştu.</td></tr>`;
         }
     }
 
     
+    fetchData(standingsURL, "standings_body", "standings", 0); 
+    
+   
+    fetchData(scorersURL, "scorers_body", "stats", 5);       
     
     
-    fetchData(standingsURL, "standings_body", 9, 0); 
-    
-    
-    fetchData(scorersURL, "scorers_body", 2, 5);       
-    
-    
-    fetchData(assistsURL, "assists_body", 2, 5);       
+    fetchData(assistsURL, "assists_body", "stats", 5);       
 
 </script>
 
