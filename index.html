@@ -143,6 +143,9 @@
 
 
     
+    
+    
+
     <script>
     const standingsURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHg4fAaHacYp2mjiCm1VZeepZYsMzjxAmYexmpto9f9XMXM9HCiaFPfd0MhE8DGWlEaNCz3JDh07Xr/pub?gid=0&single=true&output=csv";
     const scorersURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHg4fAaHacYp2mjiCm1VZeepZYsMzjxAmYexmpto9f9XMXM9HCiaFPfd0MhE8DGWlEaNCz3JDh07Xr/pub?gid=468146902&single=true&output=csv";
@@ -154,8 +157,6 @@
             if (!response.ok) throw new Error("Linke ulaşılamadı");
             
             const csvData = await response.text();
-            // Google Sheets bazen CSV'yi tırnaklı, bazen düz virgüllü verir.
-            // Bu regex, tırnak içindeki virgülleri görmezden gelerek ayırır.
             const rows = csvData.split('\n').slice(1); 
             const tbody = document.getElementById(tbodyID);
             
@@ -168,7 +169,7 @@
                 if (limit > 0 && countLimit >= limit) break;
 
                 const row = rows[i];
-                // Virgülle ayırma işlemi (Karmaşık CSV satırları için güvenli yöntem)
+                // CSV Ayırıcı (Tırnak içindeki virgül ve satır sonlarını korur)
                 const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                 
                 let rowHTML = "";
@@ -199,19 +200,42 @@
                      tbody.appendChild(tr);
 
                 } 
-                // --- 2. GOL KRALLIĞI (Senin Tarifine Göre: A=İsim+Takım, B=Gol) ---
+                // --- 2. GOL KRALLIĞI (HÜCRE İÇİNDE AYRIŞTIRMA) ---
                 else if (type === "scorers") {
-                    // Sütun A (Index 0): Oyuncu Adı ve Takımı
-                    // Sütun B (Index 1): Gol Sayısı
-                    let col0 = cols[0] ? cols[0].replace(/[*"]/g, "").trim() : "";
-                    let col1 = cols[1] ? cols[1].replace(/[*"]/g, "").trim() : "0";
+                    // Sütun A (cols[0]): "*ELDOR SHOMURODOV*\nRAMS BAŞAKŞEHİR"
+                    // Sütun B (cols[1]): "*15*"
+                    
+                    let rawCol0 = cols[0] ? cols[0] : "";
+                    let rawCol1 = cols[1] ? cols[1].replace(/[*"]/g, "").trim() : "0";
 
-                    // Eğer isim boşsa atla
-                    if (!col0) continue;
+                    // Eğer veri boşsa atla
+                    if (!rawCol0) continue;
+
+                    // 1. ADIM: Yıldızlar arasındaki Oyuncu İsmini çek
+                    // Regex: Yıldızla başla, aradaki her şeyi al, yıldızla bitir
+                    let playerMatch = rawCol0.match(/\*(.*?)\*/);
+                    let playerName = "";
+                    let teamName = "";
+
+                    if (playerMatch) {
+                        playerName = playerMatch[1].trim(); // Sadece ismi al (Eldor...)
+                        
+                        // 2. ADIM: Takım ismini bulmak için oyuncu ismini ve yıldızları sil
+                        // Geriye kalan yazı Takım ismidir.
+                        teamName = rawCol0.replace(playerMatch[0], "").replace(/"/g, "").trim();
+                    } else {
+                        // Yıldız yoksa düz yaz
+                        playerName = rawCol0.replace(/"/g, "").trim();
+                    }
 
                     rowHTML += `<td>${rankCounter}</td>
-                                <td style="text-align:left; font-weight:bold;">${col0}</td>
-                                <td><strong>${col1}</strong></td>`;
+                                <td style="text-align:left; font-weight:bold;">
+                                    ${playerName} 
+                                    <span style="font-size:0.85em; font-weight:normal; color:#555; margin-left:5px;">
+                                        (${teamName})
+                                    </span>
+                                </td>
+                                <td><strong>${rawCol1}</strong></td>`;
                     
                     const tr = document.createElement("tr");
                     tr.innerHTML = rowHTML;
@@ -221,17 +245,12 @@
                     countLimit++;
 
                 } 
-                // --- 3. ASİST KRALLIĞI (Görsele Göre: B=Oyuncu, C=Takım, E=Asist) ---
+                // --- 3. ASİST KRALLIĞI (BU ZATEN DOĞRU ÇALIŞIYOR) ---
                 else if (type === "assists") {
-                    // Sütun B (Index 1): Oyuncu
-                    // Sütun C (Index 2): Takım
-                    // Sütun E (Index 4): Asist (*9* formatında)
-                    
                     let playerName = cols[1] ? cols[1].replace(/[*"]/g, "").trim() : "";
                     let teamName = cols[2] ? cols[2].replace(/[*"]/g, "").trim() : "";
                     let assists = cols[4] ? cols[4].replace(/[*"]/g, "").trim() : "0";
 
-                    // Boş satırları veya başlık satırını atla
                     if (!playerName || playerName === "Oyuncu" || assists === "") continue;
 
                     rowHTML += `<td>${rankCounter}</td>
@@ -258,15 +277,8 @@
     }
 
     // --- ÇALIŞTIRMA ---
-    
-    // 1. Puan Durumu
     fetchData(standingsURL, "standings_body", "standings", 0); 
-    
-    // 2. Gol Krallığı (TFF'den gelen A=İsimTakım, B=Gol formatı)
     fetchData(scorersURL, "scorers_body", "scorers", 5);       
-    
-    // 3. Asist Krallığı (Görseldeki temiz tablo formatı)
-    // DİKKAT: assistsURL değişkenine yeni tablonun CSV linkini koymalısın.
     fetchData(assistsURL, "assists_body", "assists", 5);       
 
 </script>
