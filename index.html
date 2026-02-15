@@ -6,180 +6,36 @@
 <title>Turkish Super League - Live Stats</title>
 
 <style>
-    body {
-        background: rgb(186, 93, 7);
-        color: black;
-        margin: 0;
-        padding: 0;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    h1, h2 {
-        color: white;
-        text-align: center;
-        padding: 20px 0;
-        margin: 0;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-    }
-
+    /* --- TASARIM KISMI (AYNI) --- */
+    body { background: rgb(186, 93, 7); color: black; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+    h1, h2 { color: white; text-align: center; padding: 20px 0; margin: 0; text-transform: uppercase; }
     
-    .menu_container {
-        background-color: #741818;
-        padding: 20px;
-        text-align: center;
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-        border-bottom: 3px solid gold;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-    }
-
-    .menu_container a {
-        color: black;
-        background-color: azure;
-        text-decoration: none;
-        padding: 10px 25px;
-        font-size: 16px;
-        font-weight: bold;
-        margin: 0 10px;
-        border: 1px solid white;
-        border-radius: 5px;
-        transition: 0.3s ease;
-        display: inline-block;
-    }
-
-    .menu_container a:hover {
-        background-color: #741818;
-        color: gold;
-        border-color: gold;
-    }
-
+    .menu_container { background-color: #741818; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 1000; border-bottom: 3px solid gold; }
+    .menu_container a { color: black; background-color: azure; text-decoration: none; padding: 10px 25px; margin: 0 10px; border-radius: 5px; font-weight: bold; }
     
-    .teams_container {
-        background-color: white;
-        margin: 20px auto;
-        padding: 20px;
-        max-width: 1000px;
-        display: grid;
-        grid-template-columns: repeat(3, 1fr); 
-        gap: 20px;
-        border-radius: 10px;
-    }
+    .teams_container { background-color: white; margin: 20px auto; padding: 20px; max-width: 1000px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; border-radius: 10px; }
+    .team_card { display: flex; flex-direction: column; align-items: center; padding: 15px; border: 1px solid #eee; border-radius: 8px; }
+    .team_card img { width: 60px; height: 60px; object-fit: contain; }
+    .team_card p { margin-top: 10px; font-weight: bold; text-align: center; }
 
-    .team_card {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 15px;
-        border: 1px solid #eee;
-        border-radius: 8px;
-        transition: 0.3s;
-    }
-
-    .team_card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-
-    .team_card img {
-        width: 60px;
-        height: 60px;
-        object-fit: contain;
-    }
-
-    .team_card p {
-        margin-top: 10px;
-        font-size: 14px;
-        font-weight: bold;
-        text-align: center;
-    }
-
+    .table_wrapper { background-color: white; margin: 20px auto; padding: 20px; max-width: 1000px; border-radius: 10px; overflow-x: auto; }
     
-    .table_wrapper {
-        background-color: white;
-        margin: 20px auto;
-        padding: 20px;
-        max-width: 1000px;
-        border-radius: 10px;
-        overflow-x: auto;
-        box-shadow: 0 0 20px rgba(0,0,0,0.2);
-    }
+    .stats_container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1000px; margin: 0 auto 40px auto; }
+    .stat_box { background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .stat_box h3 { text-align: center; color: #741818; border-bottom: 2px solid gold; padding-bottom: 10px; margin-top: 0; }
 
+    table { width: 100%; border-collapse: collapse; }
+    thead { background-color: #741818; color: white; }
+    th, td { padding: 12px; text-align: center; border-bottom: 1px solid #ddd; font-size: 14px; }
+    .points_col { font-weight: bold; color: #741818; font-size: 1.1em; }
     
-    .stats_container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        max-width: 1000px;
-        margin: 0 auto 40px auto;
-    }
+    /* Form Badges */
+    .form_badge { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin: 0 2px; }
+    .win { background-color: #2ecc71; } .draw { background-color: #95a5a6; } .loss { background-color: #e74c3c; }
 
-    .stat_box {
-        background-color: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.2);
-    }
-
-    .stat_box h3 {
-        text-align: center;
-        color: #741818;
-        margin-bottom: 15px;
-        text-transform: uppercase;
-        border-bottom: 2px solid gold;
-        padding-bottom: 10px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 10px;
-    }
-
-    thead {
-        background-color: #741818;
-        color: white;
-    }
-
-    th, td {
-        padding: 12px;
-        text-align: center;
-        border-bottom: 1px solid #ddd;
-        font-size: 14px;
-    }
-
-    tbody tr:hover {
-        background-color: #f9f9f9;
-    }
-
-    .points_col { font-weight: bold; color: #741818; }
-
-    
-    .form_badge {
-        display: inline-block;
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        margin: 0 2px;
-    }
-    .win { background-color: #2ecc71; }
-    .draw { background-color: #95a5a6; }
-    .loss { background-color: #e74c3c; }
-
-    @media (max-width: 768px) {
-        .teams_container {
-            grid-template-columns: 1fr 1fr;
-        }
-        .stats_container {
-            grid-template-columns: 1fr;
-            padding: 0 20px;
-        }
-        .menu_container a {
-            display: block;
-            margin: 5px auto;
-            width: 90%;
-        }
+    @media (max-width: 768px) { 
+        .teams_container { grid-template-columns: 1fr 1fr; } 
+        .stats_container { grid-template-columns: 1fr; } 
     }
 </style>
 </head>
@@ -241,7 +97,6 @@
 
 <h2 id="stats">Player Statistics</h2>
 <div class="stats_container">
-    
     <div class="stat_box">
         <h3>Top Scorers</h3>
         <table>
@@ -273,18 +128,16 @@
             </tbody>
         </table>
     </div>
-
 </div>
 
 <script>
+    
     const standingsURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHg4fAaHacYp2mjiCm1VZeepZYsMzjxAmYexmpto9f9XMXM9HCiaFPfd0MhE8DGWlEaNCz3JDh07Xr/pub?gid=0&single=true&output=csv";
-    
     const scorersURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHg4fAaHacYp2mjiCm1VZeepZYsMzjxAmYexmpto9f9XMXM9HCiaFPfd0MhE8DGWlEaNCz3JDh07Xr/pub?gid=468146902&single=true&output=csv";
-
-    const assistsURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHg4fAaHacYp2mjiCm1VZeepZYsMzjxAmYexmpto9f9XMXM9HCiaFPfd0MhE8DGWlEaNCz3JDh07Xr/pub?gid=468146902&single=true&output=csv";
-
-
     
+    
+    const assistsURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHg4fAaHacYp2mjiCm1VZeepZYsMzjxAmYexmpto9f9XMXM9HCiaFPfd0MhE8DGWlEaNCz3JDh07Xr/pub?gid=1186417530&single=true&output=csv";
+
     async function fetchData(url, tbodyID, colCount, limit = 0) {
         try {
             const response = await fetch(url);
@@ -293,58 +146,80 @@
             const csvData = await response.text();
             const rows = csvData.split('\n').slice(1);
             const tbody = document.getElementById(tbodyID);
-        
+            
             tbody.innerHTML = "";
-
+            
             
             const targetRows = limit > 0 ? rows.slice(0, limit) : rows;
 
-            targetRows.forEach(row => {
+            targetRows.forEach((row, index) => {
                 const cols = row.split(',');
-                if (cols.length >= colCount) {
-                    const tr = document.createElement("tr");
-                    let rowHTML = "";
-                    
-                    for (let i = 0; i < colCount; i++) {
-                        let cellData = cols[i].replace(/[*"]/g, "").trim();
-                        
-                        
-                        if (tbodyID === "standings_body" && i === 9) {
-                            rowHTML += `<td class="points_col">${cellData}</td>`;
+                
+                
+                if (cols.length < 2) return;
+
+                const tr = document.createElement("tr");
+                let rowHTML = "";
+
+                
+                if (tbodyID === "standings_body") {
+                     
+                     let rawName = cols[0].replace(/[*"]/g, "").trim();
+                     let rank = "-";
+                     let teamName = rawName;
+
+                     if (rawName.includes('.')) {
+                        let parts = rawName.split('.');
+                        rank = parts[0];
+                        teamName = parts.slice(1).join('.').trim();
+                     }
+
+                     rowHTML += `<td>${rank}</td><td style="text-align:left; font-weight:bold;">${teamName}</td>`;
+                     
+                     
+                     for(let i=1; i<9; i++) {
+                        let data = cols[i] ? cols[i].replace(/[*"]/g, "").trim() : "-";
+                        if(i === 8) {
+                            rowHTML += `<td class="points_col">${data}</td>`;
                         } else {
-                            rowHTML += `<td>${cellData}</td>`;
+                            rowHTML += `<td>${data}</td>`;
                         }
-                    }
-
+                     }
+                     
+                     rowHTML += `<td><span class="form_badge win"></span><span class="form_badge win"></span><span class="form_badge draw"></span><span class="form_badge win"></span><span class="form_badge loss"></span></td>`;
+                
+                
+                } else {
                     
-                    if (tbodyID === "standings_body") {
-                        rowHTML += `<td>
-                            <span class="form_badge win"></span>
-                            <span class="form_badge win"></span>
-                            <span class="form_badge draw"></span>
-                            <span class="form_badge win"></span>
-                            <span class="form_badge loss"></span>
-                        </td>`;
-                    }
+                    
+                    let rank = index + 1;
+                    let playerInfo = cols[0].replace(/[*"]/g, "").trim();
+                    let count = cols[1] ? cols[1].replace(/[*"]/g, "").trim() : "0";
 
-                    tr.innerHTML = rowHTML;
-                    tbody.appendChild(tr);
+                    rowHTML += `<td>${rank}</td>
+                                <td style="text-align:left;">${playerInfo}</td>
+                                <td><strong>${count}</strong></td>`;
                 }
+
+                tr.innerHTML = rowHTML;
+                tbody.appendChild(tr);
             });
         } catch (error) {
             console.error("Failed to fetch data:", error);
-            document.getElementById(tbodyID).innerHTML = `<tr><td colspan="100%">Error loading data.</td></tr>`;
+            document.getElementById(tbodyID).innerHTML = `<tr><td colspan="100%">Error loading data. Check console.</td></tr>`;
         }
     }
 
     
     
     
-    fetchData(standingsURL, "standings_body", 10, 0); 
+    fetchData(standingsURL, "standings_body", 9, 0); 
     
-    fetchData(scorersURL, "scorers_body", 3, 5);       
     
-    fetchData(assistsURL, "assists_body", 3, 5);       
+    fetchData(scorersURL, "scorers_body", 2, 5);       
+    
+    
+    fetchData(assistsURL, "assists_body", 2, 5);       
 
 </script>
 
