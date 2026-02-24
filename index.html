@@ -6,7 +6,7 @@
 <title>Turkish Super League - Live Stats</title>
 
 <style>
-    /* --- TASARIM KISMI (AYNI) --- */
+    
     body { background: rgb(186, 93, 7); color: black; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
     h1, h2 { color: white; text-align: center; padding: 20px 0; margin: 0; text-transform: uppercase; }
     
@@ -29,7 +29,7 @@
     th, td { padding: 12px; text-align: center; border-bottom: 1px solid #ddd; font-size: 14px; }
     .points_col { font-weight: bold; color: #741818; font-size: 1.1em; }
     
-    /* Form Badges */
+    
     .form_badge { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin: 0 2px; }
     .win { background-color: #2ecc71; } .draw { background-color: #95a5a6; } .loss { background-color: #e74c3c; }
 
@@ -146,10 +146,54 @@
     
     
 
-    <script>
+<script>
     const standingsURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHg4fAaHacYp2mjiCm1VZeepZYsMzjxAmYexmpto9f9XMXM9HCiaFPfd0MhE8DGWlEaNCz3JDh07Xr/pub?gid=0&single=true&output=csv";
     const scorersURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHg4fAaHacYp2mjiCm1VZeepZYsMzjxAmYexmpto9f9XMXM9HCiaFPfd0MhE8DGWlEaNCz3JDh07Xr/pub?gid=468146902&single=true&output=csv";
     const assistsURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHg4fAaHacYp2mjiCm1VZeepZYsMzjxAmYexmpto9f9XMXM9HCiaFPfd0MhE8DGWlEaNCz3JDh07Xr/pub?gid=1186417530&single=true&output=csv";
+
+    
+    function parseCSV(text) {
+        let result = [];
+        let row = [];
+        let inQuotes = false;
+        let cell = "";
+        
+        for (let i = 0; i < text.length; i++) {
+            let char = text[i];
+            
+            if (inQuotes) {
+                if (char === '"') {
+                    if (i + 1 < text.length && text[i + 1] === '"') {
+                        cell += '"';
+                        i++;
+                    } else {
+                        inQuotes = false;
+                    }
+                } else {
+                    cell += char;
+                }
+            } else {
+                if (char === '"') {
+                    inQuotes = true;
+                } else if (char === ',') {
+                    row.push(cell);
+                    cell = "";
+                } else if (char === '\n') {
+                    row.push(cell);
+                    result.push(row);
+                    row = [];
+                    cell = "";
+                } else if (char !== '\r') {
+                    cell += char;
+                }
+            }
+        }
+        if (cell || text[text.length - 1] === ',' || text[text.length - 1] === '\n') {
+             row.push(cell);
+        }
+        if (row.length > 0) result.push(row);
+        return result;
+    }
 
     async function fetchData(url, tbodyID, type, limit = 0) {
         try {
@@ -157,9 +201,12 @@
             if (!response.ok) throw new Error("Linke ulaşılamadı");
             
             const csvData = await response.text();
-            const rows = csvData.split('\n').slice(1); 
-            const tbody = document.getElementById(tbodyID);
             
+            
+            const allRows = parseCSV(csvData);
+            const rows = allRows.slice(1); 
+            
+            const tbody = document.getElementById(tbodyID);
             tbody.innerHTML = "";
             
             let rankCounter = 1; 
@@ -168,13 +215,12 @@
             for (let i = 0; i < rows.length; i++) {
                 if (limit > 0 && countLimit >= limit) break;
 
-                const row = rows[i];
-                // CSV Ayırıcı (Tırnak içindeki virgül ve satır sonlarını korur)
-                const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                const cols = rows[i];
+                if (!cols || cols.length === 0) continue;
                 
                 let rowHTML = "";
 
-                // --- 1. PUAN DURUMU (STANDINGS) ---
+                
                 if (type === "standings") {
                      let rawName = cols[0] ? cols[0].replace(/[*"]/g, "").trim() : "";
                      if (!rawName || cols.length < 8) continue;
@@ -200,32 +246,22 @@
                      tbody.appendChild(tr);
 
                 } 
-                // --- 2. GOL KRALLIĞI (HÜCRE İÇİNDE AYRIŞTIRMA) ---
+                
                 else if (type === "scorers") {
-                    // Sütun A (cols[0]): "*ELDOR SHOMURODOV*\nRAMS BAŞAKŞEHİR"
-                    // Sütun B (cols[1]): "*15*"
-                    
                     let rawCol0 = cols[0] ? cols[0] : "";
                     let rawCol1 = cols[1] ? cols[1].replace(/[*"]/g, "").trim() : "0";
 
-                    // Eğer veri boşsa atla
                     if (!rawCol0) continue;
 
-                    // 1. ADIM: Yıldızlar arasındaki Oyuncu İsmini çek
-                    // Regex: Yıldızla başla, aradaki her şeyi al, yıldızla bitir
                     let playerMatch = rawCol0.match(/\*(.*?)\*/);
                     let playerName = "";
                     let teamName = "";
 
                     if (playerMatch) {
-                        playerName = playerMatch[1].trim(); // Sadece ismi al (Eldor...)
-                        
-                        // 2. ADIM: Takım ismini bulmak için oyuncu ismini ve yıldızları sil
-                        // Geriye kalan yazı Takım ismidir.
-                        teamName = rawCol0.replace(playerMatch[0], "").replace(/"/g, "").trim();
+                        playerName = playerMatch[1].trim(); 
+                        teamName = rawCol0.replace(playerMatch[0], "").replace(/[\n\r"]/g, "").trim();
                     } else {
-                        // Yıldız yoksa düz yaz
-                        playerName = rawCol0.replace(/"/g, "").trim();
+                        playerName = rawCol0.replace(/[\n\r"]/g, "").trim();
                     }
 
                     rowHTML += `<td>${rankCounter}</td>
@@ -245,7 +281,7 @@
                     countLimit++;
 
                 } 
-                // --- 3. ASİST KRALLIĞI (BU ZATEN DOĞRU ÇALIŞIYOR) ---
+                
                 else if (type === "assists") {
                     let playerName = cols[1] ? cols[1].replace(/[*"]/g, "").trim() : "";
                     let teamName = cols[2] ? cols[2].replace(/[*"]/g, "").trim() : "";
@@ -276,7 +312,7 @@
         }
     }
 
-    // --- ÇALIŞTIRMA ---
+    
     fetchData(standingsURL, "standings_body", "standings", 0); 
     fetchData(scorersURL, "scorers_body", "scorers", 5);       
     fetchData(assistsURL, "assists_body", "assists", 5);       
